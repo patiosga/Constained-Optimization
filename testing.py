@@ -3,8 +3,8 @@ import helper_funcs as hf
 import numpy as np
 
 if __name__ == "__main__":
-    # x = Symbol('x')
-    # y = Symbol('y')
+    x = Symbol('x')
+    y = Symbol('y')
 
     # def_expr = x**2 * y + y**2
     # print("Expression:", def_expr)
@@ -41,8 +41,10 @@ if __name__ == "__main__":
     # print("Hessian matrix value at x=2, y=3:", hessian_value)
     
 
-    matrix = [[-1, 0, -2], [0, -1, -2], [-2, -2, 0]]
-    matrix = np.array(matrix)
-    determinant = np.linalg.det(matrix)
-    print("Determinant of the matrix:", determinant)
+    # Random testing
+    f = x
+    for i in range(5):
+        f += x**i
+
+    print(f)
 

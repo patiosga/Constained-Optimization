@@ -15,14 +15,9 @@ class lagrangian_func():
         lambda_var = Symbol('lambda')
         self.variables.append(lambda_var)
 
-        # Ορίζω την συνάρτηση lagrangian L(x, λ) = f(x) - Σ λ_i * g_i(x) για i = 1, 2
-        if len(self.contraints) == 1:
-            self.lagrangian = self.main_func - lambda_var * self.contraints[0]
-        elif len(self.contraints) == 2:
-            self.lagrangian = self.main_func - lambda_var * self.contraints[0] - lambda_var * self.contraints[1]
-        else:
-            raise ValueError('Η συνάρτηση Lagrange δέχεται μέχρι δύο περιορισμούς')
-        
+        # Ορίζω την συνάρτηση lagrangian L(x, λ) = f(x) - Σ λ_i * g_i(x) για i = 1, 2, ...
+        self.lagrangian: Function = self.main_func - sum([lambda_var * g for g in self.contraints])
+    
         # Υπολογισμός του ανάδελτα της συνάρτησης Lagrange
         self.lagrangian_gradient: list = hf.calc_gradient(self.lagrangian, self.variables)
 

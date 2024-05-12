@@ -27,16 +27,16 @@ def hessian_matrix_value(hessian_matrix, point: dict):
     Υπολογισμός της τιμής του πίνακα H σε συγκεκριμένο σημείο x
     Η μεταβλητη var_values πρέπει να είναι λεξικο με τις τιμές των μεταβλητών --> π.χ. {x: 2, y: 3}
     '''
-    hessian_matrix = deepcopy(hessian_matrix)
+    resulting_matrix = [[0 for _ in hessian_matrix] for _ in hessian_matrix]
     
     for i, row in enumerate(hessian_matrix):
         for j, partial_derivative_func in enumerate(row):
             if (type(partial_derivative_func) == int) or (type(partial_derivative_func) == float):
-                pass  # αν είναι ήδη αριθμός δεν χρειάζεται να υπολογιστεί γιατί πετάει σφάλμα η subs
+                resulting_matrix[i][j] = partial_derivative_func  # αν είναι ήδη αριθμός δεν χρειάζεται να υπολογιστεί γιατί πετάει σφάλμα η subs
             else:
-                hessian_matrix[i][j] = float(partial_derivative_func.subs({var: value for var, value in point.items()}))
+                resulting_matrix[i][j] = float(partial_derivative_func.subs({var: value for var, value in point.items()}))  # αντικατάσταση των τιμών των μεταβλητών στην συνάρτηση         
                 
-    return hessian_matrix
+    return resulting_matrix
     
 
 def leading_principal_minor(matrix, i):
@@ -73,7 +73,7 @@ def find_extrema(lagrange_func_obj, critical_points):
     return extrema
 
 
-def sufficient_condition_second_grade(lagrange_func_obj, critical_points):
+def sufficient_condition_second_grade_one_constraint(lagrange_func_obj, critical_points):
     '''
     Ικανή συνθήκη δεύτερης τάξης για την εύρεση του είδους των ακροτάτων
     '''
@@ -108,6 +108,34 @@ def alternating_sign(lista):
     if lista[0] > 0:
         return all(lista[i] * lista[i + 1] < 0 for i in range(len(lista) - 1))
     return False
+
+
+def sufficient_condition_second_grade_two_constraints(lagrange_func_obj, critical_points):
+    '''
+    Ικανή συνθήκη δεύτερης τάξης για την εύρεση του είδους των ακροτάτων στην ειδική περίπτωση δύο περιορισμών 
+    και τριών μεταβλητών
+    '''
+    points_classification = []  # Λίστα με τα σημεία και το είδος του ακρότατου σε μορφή tuple
+
+    # Αν τα δεσμευμένα κρίσιμα σημεία είναι μόνο ένα τότε το μετατρέπω σε λίστα
+    if type(critical_points) == dict:
+        critical_points = [critical_points]
+
+    # Υπολογισμός των Εσσιανών πινάκων της συνάρτησης Lagrange στα δεσμευμένα κρίσιμα σημεία
+    hessian_values = [hessian_matrix_value(lagrange_func_obj.lagrangian_hessian, point) for point in critical_points]
+    
+    for i, hessian in enumerate(hessian_values):
+        determinant = np.linalg.det(hessian)
+        if determinant > 0:
+            points_classification.append((critical_points[i], 'local minimum'))
+        elif determinant < 0:
+            points_classification.append((critical_points[i], 'local maximum'))
+        else:
+            points_classification.append((critical_points[i], 'not a local optimizer'))
+
+    return points_classification
+
+
 
         
     

@@ -1,5 +1,5 @@
 from sympy import Symbol
-from main_solver import main_solver
+from main_solver import main_solver_one_constraint
 
 
 # Ορίζω τις μεταβλητές
@@ -13,4 +13,4 @@ main_func = x1**2 + x2**2 - x3**2
 # Ορίζω τον περιορισμό g(x) = x1 + x2 + x3 - 1 = 0
 g = x1 + x2 + x3 - 1
 
-main_solver(main_func, [g], [x1, x2, x3])
+main_solver_one_constraint(main_func, [g], [x1, x2, x3])

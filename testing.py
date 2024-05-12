@@ -1,5 +1,6 @@
 from sympy import Symbol, diff, solve
 import helper_funcs as hf
+import numpy as np
 
 if __name__ == "__main__":
     # x = Symbol('x')
@@ -29,15 +30,19 @@ if __name__ == "__main__":
 
 
     # Testing hessian_matrix funcs
-    x = Symbol('x')
-    y = Symbol('y')
-    f = x**3 + y**3
-    vars = [x, y]
-    hessian = hf.calc_hessian_matrix(f, vars)
-    print("Hessian matrix:", hessian)
-    var_values = {y:3, x:2}
-    hessian_value = hf.hessian_matrix_value(hessian, var_values)
-    print("Hessian matrix value at x=2, y=3:", hessian_value)
+    # x = Symbol('x')
+    # y = Symbol('y')
+    # f = x**3 + y**3
+    # vars = [x, y]
+    # hessian = hf.calc_hessian_matrix(f, vars)
+    # print("Hessian matrix:", hessian)
+    # var_values = {y:3, x:2}
+    # hessian_value = hf.hessian_matrix_value(hessian, var_values)
+    # print("Hessian matrix value at x=2, y=3:", hessian_value)
+    
 
-
+    matrix = [[-1, 0, -2], [0, -1, -2], [-2, -2, 0]]
+    matrix = np.array(matrix)
+    determinant = np.linalg.det(matrix)
+    print("Determinant of the matrix:", determinant)
 

@@ -1,6 +1,7 @@
-from sympy import Symbol, diff, solve
+from sympy import diff, solve
 import numpy as np
 import system_solve as sys_solve
+from copy import deepcopy
 
 def calc_partial_derivative(expr, var):
     return diff(expr, var)
@@ -21,19 +22,22 @@ def calc_hessian_matrix(func, variables):
     return hessian_matrix
 
 
-def hessian_matrix_value(hessian_matrix, var_values: dict):
+def hessian_matrix_value(hessian_matrix, point: dict):
     '''
     Υπολογισμός της τιμής του πίνακα H σε συγκεκριμένο σημείο x
     Η μεταβλητη var_values πρέπει να είναι λεξικο με τις τιμές των μεταβλητών --> π.χ. {x: 2, y: 3}
     '''
+    hessian_matrix = deepcopy(hessian_matrix)
+    
     for i, row in enumerate(hessian_matrix):
         for j, partial_derivative_func in enumerate(row):
-            hessian_matrix[i][j] = partial_derivative_func.subs({var: value for var, value in var_values.items()})
+            if (type(partial_derivative_func) == int) or (type(partial_derivative_func) == float):
+                pass  # αν είναι ήδη αριθμός δεν χρειάζεται να υπολογιστεί γιατί πετάει σφάλμα η subs
+            else:
+                hessian_matrix[i][j] = float(partial_derivative_func.subs({var: value for var, value in point.items()}))
+                
     return hessian_matrix
     
-
-   
-
 
 def leading_principal_minor(matrix, i):
     '''
@@ -44,17 +48,67 @@ def leading_principal_minor(matrix, i):
     return np.linalg.det(matrix)
 
 
-
-def is_positive_definite(matrix):
-    pass
-
-
-def is_negative_definite(matrix):
-    pass
-
-
-def find_critical_points(lagrange_func, equality_constraints):
+def find_critical_points(lagrange_func_obj):
     '''
     Εύρεση δεσμευμένων κρίσιμων σημείων της μέσω της συνάρτησης Lagrange
     '''
-    pass
+    # Υπολογισμός των σημείων που λύνουν το σύστημα
+    solution = sys_solve.system_solve(lagrange_func_obj.lagrangian_gradient)
+    # Επιστρέφει λίστα λεξικών από τα σημεία που λυνουν το σύστημα: αναδελτα της συνάρτησης Lagrange = 0
+    # π.χ. [{x: 2, y: 3, lambda: 1}, {x: 3, y: 4, lambda: 2}] -- Αν έχει μια μόνο λύση τότε επιστρέφει μόνο ενα λεξικό εκτός λίστας
+    return solution
+    
+
+
+def find_extrema(lagrange_func_obj, critical_points):
+    '''
+    Εύρεση των ακροτάτων της συνάρτησης f(x) μετά την εύρεση των δεσμευμένων κρίσιμων σημείων
+    '''
+    # Υπολογισμός των τιμών της συνάρτησης f(x) στα δεσμευμένα κρίσιμα σημεία
+    extrema = []
+    for point in critical_points:
+        # Η μεταβλητή point εδώ είναι ένα λεξικό π.χ. {x: 2, y: 3, lambda: 1}
+        point_values = {var: point[var] for var in lagrange_func_obj.variables}
+        extrema.append(point, lagrange_func_obj.main_func.subs(point_values))
+    return extrema
+
+
+def sufficient_condition_second_grade(lagrange_func_obj, critical_points):
+    '''
+    Ικανή συνθήκη δεύτερης τάξης για την εύρεση του είδους των ακροτάτων
+    '''
+    points_classification = []  # Λίστα με τα σημεία και το είδος του ακρότατου σε μορφή tuple
+
+    # Αν τα δεσμευμένα κρίσιμα σημεία είναι μόνο ένα τότε το μετατρέπω σε λίστα
+    if type(critical_points) == dict:
+        critical_points = [critical_points]
+
+    # Υπολογισμός των Εσσιανών πινάκων της συνάρτησης Lagrange στα δεσμευμένα κρίσιμα σημεία
+    hessian_values = [hessian_matrix_value(lagrange_func_obj.lagrangian_hessian, point) for point in critical_points]
+
+    for i, hessian in enumerate(hessian_values):
+        # Υπολογισμός των πρωτεύουσων ελάσσονων οριζουσών Δ_i για i = 3, 4, ..., n + 1 
+        principal_minor_values = [leading_principal_minor(hessian, i) for i in range(3, len(lagrange_func_obj.variables) + 1)]
+        
+        # Έλεγχος αν οι πρωτεύουσες ελάσσονες ορίζουσες είναι όλες θετικές
+        if all([minor < 0 for minor in principal_minor_values]):
+            points_classification.append((critical_points[i], 'local minimum'))  # Το σημείο είναι τοπικό ελάχιστο
+        # Έλεγχος αν οι πρωτεύουσες ελάσσονες ορίζουσες έχουν εναλλασσόμενο πρόσημο
+        elif alternating_sign(principal_minor_values):
+            points_classification.append((critical_points[i], 'local maximum'))  # Το σημείο είναι τοπικό μέγιστο
+        else:
+            points_classification.append((critical_points[i], 'not a local optimizer'))  # Το σημείο δεν μπορεί να κριθεί με την ικανή συνθήκη δεύτερης τάξης
+    return points_classification
+
+
+def alternating_sign(lista):
+    '''
+    Επιστρέφει True αν τα στοιχεία της λίστας έχουν εναλλασόμενο πρόσημο με το πρώτο να είναι θετικό (Εδώ η Δ_3)
+    '''
+    if lista[0] > 0:
+        return all(lista[i] * lista[i + 1] < 0 for i in range(len(lista) - 1))
+    return False
+
+        
+    
+    

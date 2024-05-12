@@ -1,43 +1,43 @@
-from sympy import symbols, lambdify
-import numpy as np
-from scipy.optimize import fsolve
+from sympy import Symbol, diff, solve
+import helper_funcs as hf
+
+if __name__ == "__main__":
+    # x = Symbol('x')
+    # y = Symbol('y')
+
+    # def_expr = x**2 * y + y**2
+    # print("Expression:", def_expr)
+
+    # partial_dx = diff(def_expr, x)
+    # partial_dy = diff(def_expr, y)
+
+    # print("Partial derivative of f w.r.t. x:", partial_dx)
+    # print("Partial derivative of f w.r.t. y:", partial_dy)
+    # x_val = 2
+    # y_val = 3
+    # partial_dx_eval = partial_dx.subs({x: x_val, y: y_val})
+    # partial_dy_eval = partial_dy.subs({x: x_val, y: y_val})
+    # print("Partial derivative of f w.r.t. x at x=2, y=3:", partial_dx_eval)
+    # print("Partial derivative of f w.r.t. y at x=2, y=3:", partial_dy_eval)
 
 
-if __name__ == '__main__':
-    # Define symbols
-    x, y = symbols('x y')
-
-    # Non-linear system of equations (modified)
-    equation1 = x**2 - y  # Circle equation with radius sqrt(2)
-    equation2 = x - y  # Simpler non-linear equation
-
- 
-
-    # Initial guess for the solution (adjust as needed)
-    initial_guess = [0.9, -0.3]  # This is just a starting point
-
-    # Use fsolve to find real solutions
-    # solutions = fsolve(lambda x: [f1(*x), f2(*x)], initial_guess)
-    # solutions = fsolve([equation1, equation2], initial_guess)
-
-    # solutions = fsolve([f1, f2], initial_guess)
-
-    # print("Real solutions:", solutions)
+    # Working leading_principal_minor
+    # matrix = [[1, 2], [2, 1]]
+    # print("Matrix:", matrix)
+    # print("Determinant of leading principal minor 1 :",  hf.leading_principal_minor(matrix, 1))
+    # print("Determinant of leading principal minor 2 :", hf.leading_principal_minor(matrix, 2))
 
 
-    import sympy as sym
-    # Define the variables
-    x, y = sym.symbols('x y')
+    # Testing hessian_matrix funcs
+    x = Symbol('x')
+    y = Symbol('y')
+    f = x**3 + y**3
+    vars = [x, y]
+    hessian = hf.calc_hessian_matrix(f, vars)
+    print("Hessian matrix:", hessian)
+    var_values = {y:3, x:2}
+    hessian_value = hf.hessian_matrix_value(hessian, var_values)
+    print("Hessian matrix value at x=2, y=3:", hessian_value)
 
-    # Define the equations
-    eq1 = sym.Eq(x**2 - y, 0)
-    eq2 = sym.Eq(x - y, 0)
-    eq3 = sym.Eq(x + y, 0)
 
-    # Initial guess for the solution
-    initial_guess = [-1, -1]
-
-    # Use nsolve to find the solution
-    solution = sym.solve([eq1, eq2, eq3], (x, y))
-    print("Solution:", solution)
 

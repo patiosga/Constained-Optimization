@@ -2,6 +2,14 @@ from sympy import Symbol, diff, solve
 import helper_funcs as hf
 import numpy as np
 
+
+from sympy import Symbol, sympify
+
+def my_function(x, y):
+  z = x**2 + y**3  # Replace this with your actual function
+  return sympify(z)  # Convert to symbolic expression (optional)
+
+
 if __name__ == "__main__":
     x = Symbol('x')
     y = Symbol('y')
@@ -41,10 +49,46 @@ if __name__ == "__main__":
     # print("Hessian matrix value at x=2, y=3:", hessian_value)
     
 
-    # Random testing
-    f = x
-    for i in range(5):
-        f += x**i
+    import numpy as np
 
-    print(f)
+    x_min, x_max = -2, 2
+    y_min, y_max = -2, 2
+    resolution = 50
+
+    x = np.linspace(x_min, x_max, resolution)
+    y = np.linspace(y_min, y_max, resolution)
+    X, Y = np.meshgrid(x, y)
+
+    Z = np.zeros_like(X)
+    X_flat = X.flatten()  # Reshape X to a 1D array
+    Y_flat = Y.flatten()  # Reshape Y to a 1D array
+
+    for i in range(resolution):
+      for j in range(resolution):
+        Z[i, j] = my_function(X_flat[i * resolution + j], Y_flat[i * resolution + j]).evalf()  # Evaluate the function
+
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111, projection='3d')
+
+    surf = ax.plot_surface(X, Y, Z, cmap='viridis')  # Adjust 'cmap' for colormap
+
+    # Optional: Set labels and title
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('3D Function Visualization')
+
+    # Example points
+    highlight_x = [0, 1]
+    highlight_y = [0, -1]
+    highlight_z = [my_function(x, y) for x, y in zip(highlight_x, highlight_y)]
+
+    ax.scatter(highlight_x, highlight_y, highlight_z, c='red', marker='o', s=80)
+
+
+    plt.show()
+
+
 

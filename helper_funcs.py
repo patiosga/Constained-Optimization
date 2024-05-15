@@ -57,20 +57,6 @@ def find_critical_points(lagrange_func_obj):
     # Επιστρέφει λίστα λεξικών από τα σημεία που λυνουν το σύστημα: αναδελτα της συνάρτησης Lagrange = 0
     # π.χ. [{x: 2, y: 3, lambda: 1}, {x: 3, y: 4, lambda: 2}] -- Αν έχει μια μόνο λύση τότε επιστρέφει μόνο ενα λεξικό εκτός λίστας
     return solution
-    
-
-
-def find_extrema(lagrange_func_obj, critical_points):
-    '''
-    Εύρεση των ακροτάτων της συνάρτησης f(x) μετά την εύρεση των δεσμευμένων κρίσιμων σημείων
-    '''
-    # Υπολογισμός των τιμών της συνάρτησης f(x) στα δεσμευμένα κρίσιμα σημεία
-    extrema = []
-    for point in critical_points:
-        # Η μεταβλητή point εδώ είναι ένα λεξικό π.χ. {x: 2, y: 3, lambda: 1}
-        point_values = {var: point[var] for var in lagrange_func_obj.variables}
-        extrema.append(point, lagrange_func_obj.main_func.subs(point_values))
-    return extrema
 
 
 def sufficient_condition_second_grade_one_constraint(lagrange_func_obj, critical_points):

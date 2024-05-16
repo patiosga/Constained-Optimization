@@ -59,7 +59,6 @@ def visualize_example1_0():
     x = np.array([-1, 1])
     y = np.array([-1, 1])
     z = my_function_1_f(x, y)
-    print(z)
     ax.scatter(x, y, z, color='red', alpha=1)
 
 

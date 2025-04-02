@@ -15,3 +15,10 @@ def system_solve(functions):
         
     return solutions
 
+x = sym.symbols('x', real=True)
+y = sym.symbols('y', real=True)
+z = sym.symbols('z',  real=True)
+
+functions = [2*x - z*(y-1), 2*y - z*(x-1), x*y - x - 2*y]
+solutions = system_solve(functions)
+print(solutions)
